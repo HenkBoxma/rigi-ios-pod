@@ -7,7 +7,7 @@ Use the following lines near the top of your `Podfile`:
 
 ```
 source 'https://cdn.cocoapods.org/'
-source 'https://github.com/Dimi70/rigi-ios-sdk-Specs.git'
+source 'https://github.com/HenkBoxma/rigi-ios'
 ```
 
 Specify the version you want to use, like so:
