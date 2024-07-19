@@ -1,12 +1,12 @@
 # Specs
-Pepository for Swift Package and Rigi Cocoapod specs.
+Repository for Rigi Swift Package and Cocoapod specs.
 
 # Documentation
 
 See https://github.com/HenkBoxma/rigi-ios for extensive instructions how to setup Rigi SDK in your project.
 
 
-# Install the Rigi SDK
+# Install the SDK
 
 ## Swift Package Manager
 
