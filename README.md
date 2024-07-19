@@ -3,10 +3,10 @@ Pepository for Swift Package and Rigi Cocoapod specs.
 
 # Documentation
 
-See: https://github.com/HenkBoxma/rigi-ios for additional instructions how to setup and use the Rigi SDK in your project.
+See https://github.com/HenkBoxma/rigi-ios for extensive instructions how to setup Rigi SDK in your project.
 
 
-## Install Rigi SDK - Swift Package Manager
+## Install - Swift Package Manager
 
 Install the Swift Package from this git repository
 
@@ -14,7 +14,7 @@ Install the Swift Package from this git repository
 https://github.com/HenkBoxma/rigi-ios-pod.git
 ```
 
-## Install Rigi SDK - CocoaPods
+## Install - CocoaPods
 
 Use the following lines near the top of your `Podfile`:
 
