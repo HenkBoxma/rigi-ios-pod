@@ -1,36 +1,22 @@
-// swift-tools-version:5.3
-
+// swift-tools-version:5.10.0
 import PackageDescription
 
 let package = Package(
-    name: "Rigi",
+    name: "RigiSDK",
     platforms: [
-        .iOS(.v12)
+        .iOS(.v13),
+        .macOS(.v11)
     ],
     products: [
         .library(
-            name: "Rigi",
-            targets: ["RigiTarget"]
+            name: "RigiSDK",
+            targets: ["RigiSDK"]
         ),
     ],
     targets: [
         .binaryTarget(
-            name: "RigiBinary",
-            path: "./Package/Rigi/Frameworks/Rigi.xcframework"
+            name: "RigiSDK",
+            path: "RigiSDK.xcframework"
         ),
-        .target(
-            name: "RigiTarget",
-            dependencies: ["RigiBinary"],
-            path: "./Package/Rigi",
-            exclude: [
-                "README.md",
-                "Rigi"
-            ],
-            resources: [
-                .process("Resources/Assets.xcassets"),
-                .copy("bin")
-            ]
-        ),
-    ],
-    swiftLanguageVersions: [.v5]
+    ]
 )
