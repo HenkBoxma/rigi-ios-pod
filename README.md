@@ -1,5 +1,5 @@
 # Specs
-Repository for Rigi SDK - Swift Package.
+Repository for Rigi SDK - Swift Package
 
 # Documentation
 
