@@ -1,6 +1,8 @@
 // swift-interface-format-version: 1.0
-// swift-compiler-version: Apple Swift version 6.0.2 effective-5.10 (swiftlang-6.0.2.1.2 clang-1600.0.26.4)
+// swift-compiler-version: Apple Swift version 6.0.3 effective-5.10 (swiftlang-6.0.3.1.10 clang-1600.0.30.1)
 // swift-module-flags: -target arm64-apple-ios15.6-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -Onone -enable-experimental-feature OpaqueTypeErasure -enable-bare-slash-regex -module-name RigiSDK
+import Compression
+import CryptoKit
 import Foundation
 import Swift
 import SwiftUI
@@ -9,38 +11,6 @@ import Vision
 import _Concurrency
 import _StringProcessing
 import _SwiftConcurrencyShims
-@_hasMissingDesignatedInitializers public class RigiDebug {
-  public static func test(value: Swift.String = "Eindelijk gelukt!")
-  public static var data: Swift.String
-  public static func clear()
-  public static func add(_ message: Swift.String)
-  @objc deinit
-}
-public var debugLoggingEnabled: Swift.Bool
-public enum RigiLogLevel : Swift.String {
-  case debug
-  case verbose
-  case warning
-  case error
-  public init?(rawValue: Swift.String)
-  public typealias RawValue = Swift.String
-  public var rawValue: Swift.String {
-    get
-  }
-}
-@_hasMissingDesignatedInitializers public class RigiLogger {
-  public static func log(_ level: RigiSDK.RigiLogLevel = .verbose, _ message: Swift.String, _ error: (any Swift.Error)? = nil)
-  @objc deinit
-}
-public struct RigiCmd {
-  public static func run()
-}
-@_hasMissingDesignatedInitializers public class RigiFileSystem {
-  public static var rigiDir: Swift.String? {
-    get
-  }
-  @objc deinit
-}
 extension Swift.String {
   public var rigiKey: Swift.String? {
     get
@@ -56,28 +26,11 @@ extension Swift.String {
   public mutating func replaceGroups(matching regex: Foundation.NSRegularExpression, with template: Swift.String, options: Foundation.NSRegularExpression.MatchingOptions = [])
   public func replacingGroups(matching regex: Foundation.NSRegularExpression, with transformationString: Swift.String) -> Swift.String
 }
-public struct LabelInfo {
-}
-public struct ScanResult {
-}
-@_hasMissingDesignatedInitializers public class RigiScanner {
-  public static let shared: RigiSDK.RigiScanner
-  public func performScan() async
-  @objc deinit
-}
-@_hasMissingDesignatedInitializers public class RigiScannerTree {
-  public static let shared: RigiSDK.RigiScannerTree
-  public func performScan() async -> RigiSDK.ScanResult?
-  @objc deinit
-}
-@_hasMissingDesignatedInitializers public class RigiPreviews {
-  public static let shared: RigiSDK.RigiPreviews
-  public func savePreview(scanResult: RigiSDK.ScanResult)
-  @objc deinit
-}
-@_hasMissingDesignatedInitializers public class RigiScannerOcr {
-  public static let shared: RigiSDK.RigiScannerOcr
-  public func performScan() async -> RigiSDK.ScanResult?
+@_hasMissingDesignatedInitializers public class Rigi {
+  public static let version: Swift.String
+  public static let shared: RigiSDK.Rigi
+  public static func start(_ configuration: ((inout RigiSDK.RigiSettings) -> Swift.Void)? = nil)
+  public func launch()
   @objc deinit
 }
 public struct RigiSettings {
@@ -99,13 +52,22 @@ public struct RigiSettings {
       get
     }
   }
-  public var pseudoTagsPrefix: Swift.String
-  public var pseudoTagsSuffix: Swift.String
-  public var useOcrScanning: Swift.Bool
+  public enum AlignmentStrategy {
+    case left
+    case center
+    case neighbours
+    public static func == (a: RigiSDK.RigiSettings.AlignmentStrategy, b: RigiSDK.RigiSettings.AlignmentStrategy) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
   public var ocrDebugScanning: Swift.Bool
+  public var ocrDebugMatching: Swift.Bool
   public var ocrUseAccurateScanning: Swift.Bool
   public var ocrStrokeColorTolerance: Swift.Double
   public var ocrStrokeLineOffsets: [CoreFoundation.CGFloat]
+  public var ocrAlignmentStrategy: RigiSDK.RigiSettings.AlignmentStrategy
   public var ocrAlignmentMargin: Swift.Int
   public var ocrAlignmentDifferenceTreshhold: Swift.Int
   public var ocrAlignmentColorTolerance: Swift.Double
@@ -133,11 +95,14 @@ public struct RigiSettings {
   public var includedBodyStyles: Swift.String
   public var fontStyleClasses: [Swift.String : Swift.String]
 }
-@_hasMissingDesignatedInitializers public class Rigi {
-  public static let shared: RigiSDK.Rigi
-  public static func test(value: Swift.String = "Lekker bezig!")
-  public static func configure(_ configuration: (inout RigiSDK.RigiSettings) -> Swift.Void)
-  public func start()
+@_hasMissingDesignatedInitializers public class RigiPreviews {
+  public static let shared: RigiSDK.RigiPreviews
+  public func savePreview(scanResult: RigiSDK.ScanResult)
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers public class RigiScannerOcr {
+  public static let shared: RigiSDK.RigiScannerOcr
+  public func performScan() async -> RigiSDK.ScanResult?
   @objc deinit
 }
 public class RigiButtonManager {
@@ -153,21 +118,100 @@ public class RigiButtonManager {
   @_Concurrency.MainActor public static func getScreenshot() -> UIKit.UIImage?
   @objc deinit
 }
-public struct RigiIni {
-  public init(filePath: Swift.String)
+public struct ScanResult {
+}
+public struct LabelInfo {
+}
+@_hasMissingDesignatedInitializers public class RigiScanner {
+  public static let shared: RigiSDK.RigiScanner
+  public func performScan() async
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers public class Output {
+  public static func log(_ line: Swift.String? = nil)
+  public static func step(_ line: Swift.String)
+  public static func tip(_ line: Swift.String)
+  public static func error(_ line: Swift.String)
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers public class RigCommands {
+  public static func prepareLocalizations(localizationFolder: Swift.String, rigiFolder: Swift.String, outputFolder: Swift.String) async throws
+  public static func uploadLocalizationFiles(rigiFolder: Swift.String) async throws
+  public static func uploadLocalizationSource(rigiSourceFile: Swift.String) async throws
+  public static func handleDownloadLocalizations(metaFile: Swift.String, downloadFolder: Swift.String, outputFolder: Swift.String, language: Swift.String? = nil) async throws
+  public static func collectPreviews(previewsFolder: Swift.String?, rigiFolder: Swift.String) async throws
+  public static func uploadPreviews(rigiFolder: Swift.String) async throws
+  @objc deinit
+}
+public struct ServerCredentials {
+}
+public struct RigiString : Swift.Codable {
+  public let fileOriginal: Swift.String
+  public let unitId: Swift.String
+  public let source: Swift.String
+  public let stringId: Swift.String
+  public let scannableString: Swift.String
+  public let tokenisedString: Swift.String?
+  public let signature: Swift.String?
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+@_hasMissingDesignatedInitializers public class RigiStrings {
+  public static let shared: RigiSDK.RigiStrings
+  public var strings: [Swift.String : RigiSDK.RigiString]
+  public func load() throws
+  public func findString(scanned: Swift.String) -> RigiSDK.RigiString?
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers public class RigiDebug {
+  public static var data: Swift.String
+  public static func clear()
+  public static func add(_ message: Swift.String)
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers public class RigiIni {
+  public static let shared: RigiSDK.RigiIni
+  public func load(from path: Swift.String? = nil) throws
   public func value(for key: Swift.String) -> Swift.String?
   public var allSettings: [Swift.String : Swift.String] {
     get
   }
-}
-@_hasMissingDesignatedInitializers public class RigiStrings {
-  public static let shared: RigiSDK.RigiStrings
+  public func getServerCredentials() throws -> RigiSDK.ServerCredentials
+  public func getProjectUrl() throws -> Swift.String
+  public func getSourceLanguage() -> Swift.String?
+  public func getPseudoLanguage() -> Swift.String?
+  public func pseudoPrefix() -> Swift.String
+  public func pseudoSuffix() -> Swift.String
   @objc deinit
 }
-extension RigiSDK.RigiLogLevel : Swift.Equatable {}
-extension RigiSDK.RigiLogLevel : Swift.Hashable {}
-extension RigiSDK.RigiLogLevel : Swift.RawRepresentable {}
+@_hasMissingDesignatedInitializers public class RigiFileSystem {
+  public static var rigiDir: Swift.String? {
+    get
+  }
+  @objc deinit
+}
+public var debugLoggingEnabled: Swift.Bool
+public enum RigiLogLevel : Swift.String {
+  case debug
+  case verbose
+  case warning
+  case error
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+@_hasMissingDesignatedInitializers public class RigiLogger {
+  public static func log(_ level: RigiSDK.RigiLogLevel = .verbose, _ message: Swift.String, _ error: (any Swift.Error)? = nil)
+  @objc deinit
+}
 extension RigiSDK.RigiSettings.ClipBounds : Swift.Equatable {}
 extension RigiSDK.RigiSettings.ClipBounds : Swift.Hashable {}
 extension RigiSDK.RigiSettings.DivPosition : Swift.Equatable {}
 extension RigiSDK.RigiSettings.DivPosition : Swift.Hashable {}
+extension RigiSDK.RigiSettings.AlignmentStrategy : Swift.Equatable {}
+extension RigiSDK.RigiSettings.AlignmentStrategy : Swift.Hashable {}
+extension RigiSDK.RigiLogLevel : Swift.Equatable {}
+extension RigiSDK.RigiLogLevel : Swift.Hashable {}
+extension RigiSDK.RigiLogLevel : Swift.RawRepresentable {}

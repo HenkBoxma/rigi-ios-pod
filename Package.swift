@@ -1,8 +1,10 @@
 // swift-tools-version:5.10.0
 import PackageDescription
 
+// Package.release.swift
+
 let package = Package(
-    name: "RigiSDK",
+    name: "Rigi",
     platforms: [
         .iOS(.v13),
         .macOS(.v11)
